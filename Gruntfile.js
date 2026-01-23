@@ -1,6 +1,6 @@
 module.exports = function(grunt) {
   'use strict';
-  const sass = require('node-sass');
+  const sass = require('sass');
   require('load-grunt-tasks')(grunt, {
     pattern: ['grunt-*']
   });
@@ -13,28 +13,9 @@ module.exports = function(grunt) {
       'jsSrcDir': 'src/js',
       'jsTargetDir': 'assets/js',
       'jsDependencies': [
-        '<%= config.jsSrcDir %>/libs/jquery.min.js',
-        '<%= config.jsSrcDir %>/libs/jquery.fitvids.js',
+        '<%= config.jsSrcDir %>/libs/reframe.min.js',
         '<%= config.jsSrcDir %>/libs/highlight.pack.js'
       ]
-    },
-    copy: {
-      dev: {
-        files: [{
-          dest: 'assets/font/',
-          src: '*',
-          cwd: 'src/font/',
-          expand: true
-        }]
-      },
-      dist: {
-        files: [{
-          dest: 'assets/font/',
-          src: '*',
-          cwd: 'src/font/',
-          expand: true
-        }]
-      }
     },
     clean: {
       dev: ['dev'],
@@ -62,18 +43,7 @@ module.exports = function(grunt) {
         }
       }
     },
-    postcss: {
-      options: {
-        map: false
-      },
-      dev: {
-        src: '<%=  config.cssTargetDir %>/*.css'
-      },
-      dist: {
-        src: '<%=  config.cssTargetDir %>/*.css'
-      }
-    },
-    uglify: {
+    terser: {
       js: {
         files: {
           '<%= config.jsTargetDir %>/script.js': [
@@ -86,11 +56,11 @@ module.exports = function(grunt) {
     watch: {
       css: {
         files: '<%=  config.cssSrcDir %>/**/*.scss',
-        tasks: ['sass:dev', 'copy:dev', 'postcss:dev']
+        tasks: ['sass:dev']
       },
       js: {
         files: '<%=  config.jsSrcDir %>/**/*.js',
-        tasks: ['uglify']
+        tasks: ['terser']
       }
     },
     compress: {
@@ -121,15 +91,11 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', [
     'sass:dist',
-    'postcss:dist',
-    'copy:dist',
-    'uglify'
+    'terser'
   ]);
   grunt.registerTask('default', [
     'sass:dev',
-    'postcss:dev',
-    'copy:dev',
-    'uglify',
+    'terser',
     'watch'
   ]);
 };
